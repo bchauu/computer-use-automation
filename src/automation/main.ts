@@ -5,6 +5,8 @@ startService(
   'automation',
   3001,
   process.env.AUTOMATION_MONGODB_URI,
-  (app, database) => { configureAutomation(app, database); },
+  (app, database) => {
+    configureAutomation(app, database);
+  },
   () => defaultSessionRegistry.closeAll(),
 );

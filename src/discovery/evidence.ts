@@ -2,28 +2,22 @@ import { actionEvidenceSchema } from '../contracts/capability.ts';
 import type { ActionEvidence } from '../contracts/capability.ts';
 import type { ModelAction } from '../contracts/discovery.ts';
 import type { Observation, ObservedControl } from './types.ts';
-
-function sanitizeText(value: string | null) {
-  if (value === null) return null;
-  return value
-    .replace(/[\w.+-]+@[\w.-]+\.[A-Za-z]{2,}/g, '[redacted-email]')
-    .replace(/\b\d{4,}\b/g, '[redacted-number]')
-    .replace(/\s+/g, ' ')
-    .trim()
-    .slice(0, 300);
-}
+import { sanitizePersistedText as sanitizeText } from './sanitization.ts';
 
 export function observationEvidence(observation: Observation) {
   return {
     revision: observation.revision,
     stateHash: observation.stateHash,
     route: observation.route.replace(/\?.*?(?=#|$)/, ''),
-    headings: observation.headings.map(heading => sanitizeText(heading) ?? '').filter(Boolean),
+    headings: observation.headings.map((heading) => sanitizeText(heading) ?? '').filter(Boolean),
     controlCount: observation.controls.length,
     selectedControls: observation.controls
-      .filter(control => control.tag === 'select' && control.value !== null)
-      .map(control => ({ label: sanitizeText(control.name) ?? '', value: sanitizeText(control.value) ?? '' }))
-      .filter(control => control.label && control.value),
+      .filter((control) => control.tag === 'select' && control.value !== null)
+      .map((control) => ({
+        label: sanitizeText(control.name) ?? '',
+        value: sanitizeText(control.value) ?? '',
+      }))
+      .filter((control) => control.label && control.value),
   };
 }
 
@@ -38,7 +32,7 @@ export function selectedTargetEvidence(control: ObservedControl | null) {
     disabled: control.disabled,
     contextRole: sanitizeText(control.contextRole),
     contextText: sanitizeText(control.contextText),
-    optionLabels: control.options.map(option => sanitizeText(option) ?? '').filter(Boolean),
+    optionLabels: control.options.map((option) => sanitizeText(option) ?? '').filter(Boolean),
   };
 }
 
@@ -54,7 +48,7 @@ export function buildActionEvidence(input: {
   completionCheck: { ok: boolean; code: string } | null;
 }): ActionEvidence {
   const control = input.action.targetRef
-    ? input.before.controls.find(candidate => candidate.ref === input.action.targetRef) ?? null
+    ? (input.before.controls.find((candidate) => candidate.ref === input.action.targetRef) ?? null)
     : null;
   return actionEvidenceSchema.parse({
     schemaVersion: 1,
@@ -64,11 +58,15 @@ export function buildActionEvidence(input: {
     target: selectedTargetEvidence(control),
     action: {
       kind: input.action.kind,
-      purpose: sanitizeText(input.action.purpose),
+      purpose: sanitizeText(input.action.purpose)?.slice(0, 240) || 'Purpose omitted',
       safeSelectedValue: input.action.kind === 'select' ? sanitizeText(input.action.value) : null,
       direction: input.action.kind === 'scroll' ? input.action.direction : null,
     },
-    execution: { status: input.executionStatus, code: input.executionCode, durationMs: input.durationMs },
+    execution: {
+      status: input.executionStatus,
+      code: input.executionCode,
+      durationMs: input.durationMs,
+    },
     after: input.after ? observationEvidence(input.after) : null,
     completionCheck: input.completionCheck,
   });

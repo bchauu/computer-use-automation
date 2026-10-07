@@ -1,6 +1,6 @@
 # Reviewed evidence
 
-This bundle contains schema-validated, sanitized proof selected from local runs. [`manifest.json`](manifest.json) records provenance and SHA-256 hashes for every exported file.
+This bundle contains schema-validated, sanitized proof selected from local runs. Discovery, its different-input validation replay, and the validated capability were refreshed from the authorized 2026-10-07 UTC run after the finishing fixes. Other examples retain their original dates and provenance; the manifest records each run explicitly. [`manifest.json`](manifest.json) records provenance and SHA-256 hashes for every exported file.
 
 | Run | Provenance | Expected result | What it proves |
 |---|---|---|---|

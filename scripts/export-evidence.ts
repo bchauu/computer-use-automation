@@ -6,8 +6,8 @@ import { publicRunSchema } from '../src/contracts/run.ts';
 import { stabilitySummarySchema } from '../src/contracts/stability.ts';
 
 const selections = [
-  { name: 'discovery-live', runId: process.env.EVIDENCE_DISCOVERY_RUN || 'a055664b-15ba-4caf-b65e-7d5bd529c967', provenance: 'genuine_openai' },
-  { name: 'validation-replay', runId: process.env.EVIDENCE_VALIDATION_RUN || 'a4295f92-1029-407c-bf0e-3e2d1aa900f6', provenance: 'live_model_free_replay' },
+  { name: 'discovery-live', runId: process.env.EVIDENCE_DISCOVERY_RUN || 'e71e20d0-2211-4f43-a7a7-c57ecad02938', provenance: 'genuine_openai' },
+  { name: 'validation-replay', runId: process.env.EVIDENCE_VALIDATION_RUN || '2dc1c084-6c3a-410b-b196-8d3e76956741', provenance: 'live_model_free_replay' },
   { name: 'cross-member-replay', runId: process.env.EVIDENCE_REPLAY_RUN || 'b4094048-60b7-4f7c-b201-088ab0ae395b', provenance: 'live_model_free_replay' },
   { name: 'full-pagination-replay', runId: process.env.EVIDENCE_PAGINATION_RUN || '0c9e1962-cc19-49d7-bc10-7205d5f971c2', provenance: 'live_model_free_replay' },
   { name: 'session-expiry-handoff', runId: process.env.EVIDENCE_HANDOFF_RUN || '26c148d7-78b5-4e22-bda8-a2617d5d6cb9', provenance: 'injected_runtime_condition' },

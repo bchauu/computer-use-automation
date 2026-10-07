@@ -12,7 +12,7 @@ test('persisted run summaries derive operational metrics from validated telemetr
   assert.equal(summary.status, 'succeeded');
   assert.equal(summary.modelRequestCount, 3);
   assert.equal(summary.inputTokens, 3636);
-  assert.equal(summary.outputTokens, 164);
+  assert.equal(summary.outputTokens, 162);
   assert.equal(summary.eventCount, run.events.length);
   assert.ok(summary.durationMs && summary.durationMs > 0);
   assert.equal(summary.artifact?.artifactId, 'view-transaction-history');

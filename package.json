@@ -30,6 +30,7 @@
     "mock:system": "node --env-file-if-exists=.env --experimental-strip-types scripts/mock-system-run.ts",
     "live:system": "node --env-file-if-exists=.env --experimental-strip-types scripts/live-system-run.ts",
     "replay:catalog": "node --env-file-if-exists=.env --experimental-strip-types scripts/catalog-replay-run.ts",
+    "replay:bootstrap": "node --experimental-strip-types scripts/bootstrap-replay.ts",
     "handoff:system": "node --env-file-if-exists=.env --experimental-strip-types scripts/handoff-system-run.ts",
     "handoff:decision": "node --env-file-if-exists=.env --experimental-strip-types scripts/decision-handoff-system-run.ts",
     "runtime:system": "node --env-file-if-exists=.env --experimental-strip-types scripts/runtime-system-run.ts",
@@ -38,7 +39,9 @@
     "evidence:verify": "node --experimental-strip-types scripts/verify-evidence.ts",
     "demo:record": "node --env-file-if-exists=.env --experimental-strip-types scripts/record-demo.ts",
     "format:bank": "prettier --write apps/bank/src",
-    "format:bank:check": "prettier --check apps/bank/src"
+    "format:bank:check": "prettier --check apps/bank/src",
+    "format:backend": "prettier --write src/automation",
+    "format:backend:check": "prettier --check src/automation"
   },
   "dependencies": {
     "express": "5.2.1",

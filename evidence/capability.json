@@ -218,9 +218,9 @@
   },
   "source": {
     "kind": "discovery_run",
-    "runId": "a055664b-15ba-4caf-b65e-7d5bd529c967",
+    "runId": "e71e20d0-2211-4f43-a7a7-c57ecad02938",
     "testedModel": "gpt-4o-mini",
-    "compiledAt": "2026-09-30T16:55:37.680Z",
+    "compiledAt": "2026-10-07T03:42:34.110Z",
     "evidenceSteps": [
       1,
       2,

@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-09-30T18:11:14.513Z",
+  "generatedAt": "2026-10-07T03:42:53.733Z",
   "model": "gpt-4o-mini",
   "capability": {
     "artifactId": "view-transaction-history",
@@ -10,25 +10,25 @@
   "runs": [
     {
       "name": "discovery-live",
-      "runId": "a055664b-15ba-4caf-b65e-7d5bd529c967",
+      "runId": "e71e20d0-2211-4f43-a7a7-c57ecad02938",
       "provenance": "genuine_openai",
       "mode": "discovery",
       "status": "succeeded",
       "resultCode": "SUCCESS_CRITERIA_MET",
       "modelRequestCount": 3,
-      "startedAt": "2026-09-30T16:55:29.034Z",
-      "finishedAt": "2026-09-30T16:55:37.892Z"
+      "startedAt": "2026-10-07T03:42:22.676Z",
+      "finishedAt": "2026-10-07T03:42:34.313Z"
     },
     {
       "name": "validation-replay",
-      "runId": "a4295f92-1029-407c-bf0e-3e2d1aa900f6",
+      "runId": "2dc1c084-6c3a-410b-b196-8d3e76956741",
       "provenance": "live_model_free_replay",
       "mode": "validation_replay",
       "status": "succeeded",
       "resultCode": "REPLAY_SUCCEEDED",
       "modelRequestCount": 0,
-      "startedAt": "2026-09-30T16:55:38.078Z",
-      "finishedAt": "2026-09-30T16:55:40.472Z"
+      "startedAt": "2026-10-07T03:42:34.488Z",
+      "finishedAt": "2026-10-07T03:42:37.055Z"
     },
     {
       "name": "cross-member-replay",
@@ -142,17 +142,17 @@
     }
   ],
   "files": {
-    "capability.json": "7d6a71ea2d0f81c75272a73c58013df066b33eaf82feea0ca15f15a2f436cc7b",
+    "capability.json": "ce06fca08170be4c3570e38d57a2cafc8ede07ce5d4d6d539746a542f91252dd",
     "runs/account-not-found/events.jsonl": "70a33442ba7af16a0c672f090852bc83214439951e50d93a7c3a1b70077f5ee7",
     "runs/account-not-found/run.json": "101913ae6a13cbfae07ea3e63e1d9243bdbc223c21139978ae74f94313e12340",
     "runs/application-failure/events.jsonl": "fdae85bbb327122a767b757d9aaf8aca3a18d08db9660bcf305cb35fc1dde463",
     "runs/application-failure/run.json": "11e2fdf95a42dd4d0c223ab5f5d5dd5ae152116f3b182e8371d51b4f55375bba",
     "runs/cross-member-replay/events.jsonl": "2f986271f17e1ce60806f3ae441374e689f45c7d591fc872359c8b3c1f762c76",
     "runs/cross-member-replay/run.json": "c964d254b1b29515ebf7aea135eecd688406a1eb4d5e5b4085607660fb040997",
-    "runs/discovery-live/action-evidence.jsonl": "088820a1121f1349c51b2bf844f3bd887c2f1e323cbe20888b7e133f02ed608d",
-    "runs/discovery-live/artifact.draft.json": "399f74f80c65bb4f592929fc12b62b15bc1d62e6479882626ee6034e1b6fe56e",
-    "runs/discovery-live/events.jsonl": "d311befb5baef9d1dad0d92adb00a3ef2e7a6b0f2dfb3f3f9dcf57bb6e1897e6",
-    "runs/discovery-live/run.json": "65f594167449a1adb10887287aa3866913af93c60f75743efda663366f2bce0c",
+    "runs/discovery-live/action-evidence.jsonl": "98d12957643eafe7051a1e156bad5cd65159e23a9eb8e9dac8c8ff1044ccc574",
+    "runs/discovery-live/artifact.draft.json": "034707568642ade29e843205d51274181252e0c915997663b9e210381210c38d",
+    "runs/discovery-live/events.jsonl": "f9ca572beed82d69bd79de94532b6df7f97f7897815c4c70abe7f3031bcb0752",
+    "runs/discovery-live/run.json": "b4bea6a04ddfb8e7b2a9e356ba009cadd7a1f3b17777c9ca1345e4f670dac3f8",
     "runs/full-pagination-replay/events.jsonl": "afd6c9d0de7c084c27521018ff168024c18837164e61bafce13083ab309fc4b9",
     "runs/full-pagination-replay/run.json": "2fab4ce9cd59d73adc86c9dd25714c7dc0da247cbbe2ef6558ccd0d3bbd7a27e",
     "runs/known-notice-recovery/events.jsonl": "9ac442afdfe5ecf13b48b1bdecba0cfd36e6f845a4e745b19fc773a5f78c4b98",
@@ -167,8 +167,8 @@
     "runs/slow-load-recovery/run.json": "25a4036c4617412433b17989a8dd7497c76084c0d984c11f45c5e0ac3f8ee012",
     "runs/unknown-dialog-handoff/events.jsonl": "e2c573d745185dd697ee8b3e8157e0fd3540e98622c849b4b069e976790871ef",
     "runs/unknown-dialog-handoff/run.json": "706fa51ad648614af53f5a8ca0eb80456a66b3ddfb116ea46466247c2ba45a9b",
-    "runs/validation-replay/events.jsonl": "50108a5391b3b70c2e2f6888cd07804d881ffafa0989ff7b5bb645d9a98366f9",
-    "runs/validation-replay/run.json": "6c53ffa0f3e6d7f4ca8a36f60c7ba678cac1004e3e3d0b1043c5d1c46f968fe5",
+    "runs/validation-replay/events.jsonl": "024882563ab52fdec5c714b5b7ac3752e9c36fe3a1d3bcef3bd41162159afc48",
+    "runs/validation-replay/run.json": "8ab4ae6ac677e79b2986750e63111219121010cd5e41cfbf43e58b503cf5a360",
     "stability-summary.json": "da72fda2403794ea8ed5b20a133832f0a22c82ff86c8bfaaefb6998905ffadda"
   },
   "review": {

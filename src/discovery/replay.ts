@@ -8,7 +8,7 @@ import { verifyCompletion } from './completion.ts';
 import { observe } from './observer.ts';
 import type { LiveSession } from './sessions.ts';
 import { eventInput, RunTelemetry } from './telemetry.ts';
-import { evaluateExtractionPaginationPolicy, evaluateReplayPolicy } from './policy.ts';
+import { evaluateExtractionPaginationPolicy, evaluateKnownNoticePolicy, evaluateReplayPolicy } from './policy.ts';
 import { classifyRuntime, failureDiagnostic } from './runtime.ts';
 import type { CapabilityInputs, ExecutionMode, PublicRun, RunResultCategory, TransactionOutput } from './types.ts';
 import type { Connection } from 'mongoose';
@@ -333,7 +333,7 @@ export class ReplayController {
           }
           if (precondition.kind === 'recoverable' && precondition.code === 'KNOWN_NOTICE') {
             const dismiss = session.page.getByRole('button', { name: 'Dismiss notice', exact: true });
-            if (await dismiss.count() !== 1) {
+            if (await dismiss.count() !== 1 || !(await evaluateKnownNoticePolicy(session.page, dismiss, session.allowedOrigin)).ok) {
               const diagnostic = await failureDiagnostic({ run, page: session.page, phase: 'recovery', stepId: step.id, effectState: 'not_attempted', routeTemplate: step.checkpoint.routeTemplate, expectedHeadings: step.checkpoint.requiredHeadings, recoveryAttempted: false, recoveryRuleId: precondition.ruleId, recoveryReason: 'The known notice did not expose its exact policy-approved dismissal control.' });
               return await this.finish(run, telemetry, 'failed', 'RECOVERY_TARGET_INVALID', 'The known notice could not be dismissed safely.', null, 'hard_failure', diagnostic);
             }
@@ -397,7 +397,7 @@ export class ReplayController {
           if (this.cancelRequested.has(run.runId)) return await this.finish(run, telemetry, 'cancelled', 'RUN_CANCELLED', 'Replay was cancelled while waiting for the step checkpoint.', null, 'cancelled');
           if (outcome.condition.kind === 'recoverable' && outcome.condition.code === 'KNOWN_NOTICE') {
             const dismiss = session.page.getByRole('button', { name: 'Dismiss notice', exact: true });
-            if (await dismiss.count() === 1) {
+            if (await dismiss.count() === 1 && (await evaluateKnownNoticePolicy(session.page, dismiss, session.allowedOrigin)).ok) {
               await telemetry.record(eventInput('policy', 'AUTHORED_RECOVERY_ALLOWED', run.step, { attempt, actionKind: 'click', targetRef: 'button:Dismiss notice' }));
               await dismiss.click({ timeout: step.timeoutMs });
               await telemetry.record(eventInput('action', 'AUTHORED_RECOVERY_EXECUTED', run.step, { attempt, actionKind: 'click', targetRef: 'button:Dismiss notice' }));

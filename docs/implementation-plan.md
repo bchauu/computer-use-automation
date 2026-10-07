@@ -252,6 +252,8 @@ Disable commands when the viewer does not hold ownership. Display pending and ap
 
 ## 10. Safety and data handling
 
+Implemented finishing decisions (2026-10-06): discovery and replay share live-target destination/form checks; purpose text passes bounded redaction at the telemetry writer and action-evidence builder before storage. Discovery rejects expired model decisions and stops expired retries; visible-control observations preserve original DOM indices for execution. An explicit `replay:bootstrap` command installs the reviewed validated example for fresh-checkout model-free replay and preserves existing catalog entries. Local and injected checks are recorded in `docs/acceptance.md`; the subsequently authorized GPT-4o mini discovery and different-input model-free validation passed, and the reviewed bundle was refreshed (see `docs/acceptance.md`).
+
 Enforce policy before every action in both modes and during operator relay. Defaults: configured local proxy origin and allowed paths; reviewed reversible controls; final commits, downloads, uploads, clipboard export, arbitrary scripts, and unknown navigation blocked.
 
 Canonicalize URLs and check scheme, hostname, port, path, redirects, frame navigation, popups, and form destinations. Browser-context request interception provides a second boundary; restrict app asset origins too and disable service-worker paths that bypass the intended interception. The engine's OpenAI transport is separate from browser egress. Do not interpret a same-origin URL as blanket permission for a destructive control.

@@ -6,6 +6,8 @@ The project includes two React/Vite applications and two Express entry points, M
 
 One root npm package keeps installation simple. `apps/operator` and `apps/bank` have independent Vite configurations. `src/automation` and `src/bank` start separate services; `src/shared` contains generic health and lifecycle wiring. No automated route can read bank data.
 
+The automation backend separates HTTP routing from request logic. `src/automation/server.ts` mounts the session, run, and operator routers from `routes/`; the run router mounts a handoff router that preserves the parent `runId` parameter. Named handlers in `handlers/` perform request validation, authorization, dispatch, and response mapping. `services.ts` constructs the shared session registry, model client, catalog, and execution controllers, while `authorization.ts` contains token checks. The discovery and replay engines remain in `src/discovery/`.
+
 ## Current installation status
 
 The setup machine has Node 22.22.0, npm 10.9.4, and MongoDB Community 7.0.16. Dependencies have now been installed and `package-lock.json` generated. `npm ls --depth=0` confirms all declared packages are present. The Playwright Chromium executable is also present.
@@ -32,14 +34,18 @@ For an explicitly injected local wiring check, set `DISCOVERY_MODEL_MODE=mock` o
 
 The first-run defaults allow 40 actions, ten minutes overall, two minutes per model request, 30 seconds per UI action, three transient model attempts, and three repeated identical state/action decisions. All are configurable in `.env`. Authentication/configuration errors stop; transient rate-limit, timeout, connection, and 5xx failures retry with bounded exponential delay. A failed UI click is recorded as an unknown-effect result and is not blindly repeated.
 
+The model-request block is separated into `src/discovery/model-request.ts`: provider calls, the existing retry classification (HTTP 408/409/429, 5xx, and `ETIMEDOUT`/`ECONNRESET`/`ECONNREFUSED`), exponential backoff, request telemetry, and shared per-run call/token accounting. `controller.ts` retains UI observation, ownership/action checks, execution, and completion. `src/shared/deadline.ts` supplies clock bookkeeping for the existing deadline checks; it does not cancel operations or add deadline enforcement at new points. This structural refactor leaves the prompt and retry behavior unchanged. The separately identified late-response timeout gap remains a follow-up fix.
+
 ## Verification commands
 
 - `npm run typecheck`: strict TypeScript checks across services and UIs.
 - `npm test`: all Node and Chromium integration tests. Restricted environments must permit loopback servers and browser launch.
+- `node --experimental-strip-types --test tests/discovery-policy.test.ts`: synthetic live-DOM regressions for form submission, external/undeclared destinations, changed links, downloads, new browser surfaces, and known-notice recovery. Includes injected model choices through the discovery controller; no OpenAI calls.
 - `npm run test:discovery`: goal/action contracts, artifact compilation/catalog behavior, and Chromium-driven dispatcher/replay tests without a model call.
 - `npm run test:bank-ui`: full employee lookup, verification, account, history, empty-state, and route-isolation walkthrough; start `npm run dev:bank` first.
 - `npm run mock:system`: injected discovery → draft compilation → different-input model-free validation replay against the running real banking UI.
-- `npm run live:system`: genuine OpenAI discovery → draft compilation → different-period model-free validation replay against the running real banking UI.
+- `npm run replay:bootstrap`: install the checked-in validated example into an empty local capability catalog; preserve an existing entry. Run before `npm run replay:catalog` on a fresh clone. Neither command requires OpenAI; use `OPENAI_API_KEY='' AUTOMATION_MONGODB_URI='' npm run replay:catalog` for a model-free, database-free walkthrough with `npm run dev:bank` running.
+- `npm run live:system`: genuine OpenAI discovery → draft compilation → different-period model-free validation replay against the running real banking UI. The script limits discovery to six model calls and a 15,000-token stop threshold checked after each response (not a prepaid token ceiling).
 - `npm run handoff:system`: injected employee-session expiry → same-session human relay → checkpointed model-free resume.
 - `npm run handoff:decision`: injected unknown dialog → explicit human judgment → stale/wrong command rejection → checkpointed model-free resume.
 - `npm run stability:system`: repeated model-free replay across periods, members, pagination, and business outcomes; writes an ignored local aggregate under `.local/stability/`.

@@ -5,8 +5,12 @@ import type { ActionEvidence, CapabilityArtifact } from '../contracts/capability
 import { newId } from '../contracts/discovery.ts';
 import { publicRunSchema } from '../contracts/run.ts';
 import type { PublicRun, TelemetryEvent } from './types.ts';
+import { sanitizePersistedText } from './sanitization.ts';
 
-type EventInput = Omit<TelemetryEvent, 'eventId' | 'sequence' | 'timestamp' | 'runId' | 'sessionId'>;
+type EventInput = Omit<
+  TelemetryEvent,
+  'eventId' | 'sequence' | 'timestamp' | 'runId' | 'sessionId'
+>;
 
 export class RunTelemetry {
   private sequence = 0;
@@ -20,6 +24,10 @@ export class RunTelemetry {
   async record(input: EventInput) {
     const event: TelemetryEvent = {
       ...input,
+      purpose: sanitizePersistedText(input.purpose, [
+        this.run.criteria.memberName,
+        this.run.criteria.memberId,
+      ]),
       eventId: newId(),
       runId: this.run.runId,
       sessionId: this.run.sessionId,
@@ -30,33 +38,50 @@ export class RunTelemetry {
     const directory = path.resolve('.local', 'runs', this.run.runId);
     await mkdir(directory, { recursive: true });
     const runSnapshot = publicRunSchema.parse(this.run);
-    await appendFile(path.join(directory, 'events.jsonl'), `${JSON.stringify(event)}\n`, { encoding: 'utf8', mode: 0o600 });
-    await writeFile(path.join(directory, 'run.json'), `${JSON.stringify(runSnapshot, null, 2)}\n`, { encoding: 'utf8', mode: 0o600 });
+    await appendFile(path.join(directory, 'events.jsonl'), `${JSON.stringify(event)}\n`, {
+      encoding: 'utf8',
+      mode: 0o600,
+    });
+    await writeFile(path.join(directory, 'run.json'), `${JSON.stringify(runSnapshot, null, 2)}\n`, {
+      encoding: 'utf8',
+      mode: 0o600,
+    });
     if (this.database.readyState === 1) {
-      await this.database.collection<{ runId: string; events: TelemetryEvent[] }>('discoveryRuns').updateOne(
-        { runId: this.run.runId },
-        {
-          $set: {
-            runId: this.run.runId,
-            sessionId: this.run.sessionId,
-            mode: this.run.mode,
-            status: this.run.status,
-            goalSummary: this.run.goalSummary,
-            inputs: this.run.inputs,
-            criteria: this.run.criteria,
-            step: this.run.step,
-            maxSteps: this.run.maxSteps,
-            startedAt: this.run.startedAt,
-            finishedAt: this.run.finishedAt,
-            result: this.run.result,
-            artifact: this.run.artifact,
-            updatedAt: event.timestamp,
+      await this.database
+        .collection<{ runId: string; events: TelemetryEvent[] }>('discoveryRuns')
+        .updateOne(
+          { runId: this.run.runId },
+          {
+            $set: {
+              runId: this.run.runId,
+              sessionId: this.run.sessionId,
+              mode: this.run.mode,
+              status: this.run.status,
+              goalSummary: this.run.goalSummary,
+              inputs: this.run.inputs,
+              criteria: this.run.criteria,
+              step: this.run.step,
+              maxSteps: this.run.maxSteps,
+              startedAt: this.run.startedAt,
+              finishedAt: this.run.finishedAt,
+              result: this.run.result,
+              artifact: this.run.artifact,
+              updatedAt: event.timestamp,
+            },
+            $push: { events: event },
+            $setOnInsert: { createdAt: event.timestamp },
           },
-          $push: { events: event },
-          $setOnInsert: { createdAt: event.timestamp },
-        },
-        { upsert: true },
-      ).catch(() => console.error(JSON.stringify({ service: 'automation', event: 'telemetry_mongo_write_failed', runId: this.run.runId })));
+          { upsert: true },
+        )
+        .catch(() =>
+          console.error(
+            JSON.stringify({
+              service: 'automation',
+              event: 'telemetry_mongo_write_failed',
+              runId: this.run.runId,
+            }),
+          ),
+        );
     }
     return event;
   }
@@ -64,13 +89,24 @@ export class RunTelemetry {
   async recordEvidence(evidence: ActionEvidence) {
     const directory = path.resolve('.local', 'runs', this.run.runId);
     await mkdir(directory, { recursive: true });
-    await appendFile(path.join(directory, 'action-evidence.jsonl'), `${JSON.stringify(evidence)}\n`, { encoding: 'utf8', mode: 0o600 });
+    await appendFile(
+      path.join(directory, 'action-evidence.jsonl'),
+      `${JSON.stringify(evidence)}\n`,
+      { encoding: 'utf8', mode: 0o600 },
+    );
     if (this.database.readyState === 1) {
-      await this.database.collection<{ runId: string; evidence: ActionEvidence[] }>('discoveryRuns').updateOne(
-        { runId: this.run.runId },
-        { $push: { evidence } },
-        { upsert: true },
-      ).catch(() => console.error(JSON.stringify({ service: 'automation', event: 'evidence_mongo_write_failed', runId: this.run.runId })));
+      await this.database
+        .collection<{ runId: string; evidence: ActionEvidence[] }>('discoveryRuns')
+        .updateOne({ runId: this.run.runId }, { $push: { evidence } }, { upsert: true })
+        .catch(() =>
+          console.error(
+            JSON.stringify({
+              service: 'automation',
+              event: 'evidence_mongo_write_failed',
+              runId: this.run.runId,
+            }),
+          ),
+        );
     }
   }
 
@@ -78,24 +114,46 @@ export class RunTelemetry {
     const directory = path.resolve('.local', 'runs', this.run.runId);
     await mkdir(directory, { recursive: true });
     const relativePath = path.join('.local', 'runs', this.run.runId, 'artifact.draft.json');
-    await writeFile(path.resolve(relativePath), `${JSON.stringify(artifact, null, 2)}\n`, { encoding: 'utf8', mode: 0o600 });
+    await writeFile(path.resolve(relativePath), `${JSON.stringify(artifact, null, 2)}\n`, {
+      encoding: 'utf8',
+      mode: 0o600,
+    });
     if (this.database.readyState === 1) {
-      await this.database.collection('capabilityArtifacts').updateOne(
-        { artifactId: artifact.artifactId, artifactVersion: artifact.artifactVersion, 'source.runId': artifact.source.runId },
-        { $set: artifact },
-        { upsert: true },
-      ).catch(() => console.error(JSON.stringify({ service: 'automation', event: 'artifact_mongo_write_failed', runId: this.run.runId })));
+      await this.database
+        .collection('capabilityArtifacts')
+        .updateOne(
+          {
+            artifactId: artifact.artifactId,
+            artifactVersion: artifact.artifactVersion,
+            'source.runId': artifact.source.runId,
+          },
+          { $set: artifact },
+          { upsert: true },
+        )
+        .catch(() =>
+          console.error(
+            JSON.stringify({
+              service: 'automation',
+              event: 'artifact_mongo_write_failed',
+              runId: this.run.runId,
+            }),
+          ),
+        );
     }
     return relativePath;
   }
 }
 
 export function eventInput(
-  type: TelemetryEvent['type'], code: string, step: number,
+  type: TelemetryEvent['type'],
+  code: string,
+  step: number,
   overrides: Partial<EventInput> = {},
 ): EventInput {
   return {
-    type, code, step,
+    type,
+    code,
+    step,
     attempt: 1,
     durationMs: null,
     actionKind: null,

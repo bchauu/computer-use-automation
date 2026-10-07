@@ -244,7 +244,7 @@ function faultHtml(scenario: FaultScenario) {
   window.__actionClicks = 0;
   const scenario = '${scenario}';
   const member = '<div class="member-strip"><strong>Alex Morgan</strong><span>Member #12345</span></div>';
-  const inquiry = () => member + '<h1>Transaction inquiry</h1>' + (scenario === 'notice' ? '<div role="dialog">Scheduled maintenance notice<button onclick="this.parentElement.remove()">Dismiss notice</button></div>' : '') + '<table><tbody><tr><td>Everyday Checking</td><td><a href="#/members/12345/accounts/a101/history">View history</a></td></tr></tbody></table>';
+  const inquiry = () => member + '<h1>Transaction inquiry</h1>' + (scenario === 'notice' ? '<div role="dialog"><h2>Scheduled maintenance notice</h2><button onclick="this.parentElement.remove()">Dismiss notice</button></div>' : '') + '<table><tbody><tr><td>Everyday Checking</td><td><a href="#/members/12345/accounts/a101/history">View history</a></td></tr></tbody></table>';
   function render() {
     const route = location.hash.slice(1);
     if (route === '/transactions') {

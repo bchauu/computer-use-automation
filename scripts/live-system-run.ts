@@ -60,7 +60,7 @@ try {
   const catalog = new CapabilityCatalog(discoveryCatalogDatabase, catalogDirectory);
   const discovery = new DiscoveryController(database, new OpenAIDecisionClient(apiKey, model, 120_000), {
     maxSteps: 20, runTimeoutMs: 600_000, actionTimeoutMs: 30_000, modelAttempts: 3, retryBaseMs: 1_000,
-    repeatedDecisionLimit: 3, noProgressLimit: 3, maxModelCalls: 25, maxTotalTokens: 100_000,
+    repeatedDecisionLimit: 3, noProgressLimit: 3, maxModelCalls: 6, maxTotalTokens: 15_000,
     actionPolicy: readOnlyDiscoveryPolicy,
   }, catalog);
   const replay = new ReplayController(database, catalog);
@@ -87,6 +87,7 @@ try {
 
   console.log(JSON.stringify({
     scenario: 'genuine_openai', model,
+    budget: { maxModelCalls: 6, totalTokenStopThreshold: 15_000 },
     discovery: {
       runId: discovered.runId, mode: discovered.mode, status: discovered.status, steps: discovered.step,
       resultCode: discovered.result?.code, artifactStatus: discovered.artifact?.status,
